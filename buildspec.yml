@@ -1,0 +1,34 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - FRONTEND_REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/frontend
+      - BACKEND_REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/backend
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - IMAGE_TAG=$(echo $IMAGE_TAG | cut -c 1-7)
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+  build:
+    commands:
+      - echo Building frontend image...
+      - docker build -t frontend:$IMAGE_TAG starter/frontend
+      - docker tag frontend:$IMAGE_TAG $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag frontend:$IMAGE_TAG $FRONTEND_REPOSITORY_URI:latest
+      - echo Building backend image...
+      - docker build -t backend:$IMAGE_TAG starter/backend
+      - docker tag backend:$IMAGE_TAG $BACKEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag backend:$IMAGE_TAG $BACKEND_REPOSITORY_URI:latest
+
+  post_build:
+    commands:
+      - echo Pushing frontend image...
+      - docker push $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker push $FRONTEND_REPOSITORY_URI:latest
+      - echo Pushing backend image...
+      - docker push $BACKEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker push $BACKEND_REPOSITORY_URI:latest
+      - echo Build completed successfully
