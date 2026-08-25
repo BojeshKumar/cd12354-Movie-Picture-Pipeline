@@ -6,9 +6,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'starter/backend/**'
-      - '.github/workflows/backend-cd.yaml'
 
 jobs:
   lint:

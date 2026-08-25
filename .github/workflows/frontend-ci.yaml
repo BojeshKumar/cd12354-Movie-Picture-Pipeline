@@ -6,9 +6,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'starter/frontend/**'
-      - '.github/workflows/frontend-ci.yaml'
 
 jobs:
   lint:
