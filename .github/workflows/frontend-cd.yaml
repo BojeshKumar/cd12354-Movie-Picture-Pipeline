@@ -118,7 +118,11 @@ jobs:
 
       - name: Deploy frontend to Kubernetes
         run: |
-          kubectl set image deployment/frontend \
+          cd k8s
+
+          kustomize edit set image \
             frontend=146029314468.dkr.ecr.us-east-1.amazonaws.com/frontend:${{ github.sha }}
+
+          kustomize build | kubectl apply -f -
 
           kubectl rollout status deployment/frontend

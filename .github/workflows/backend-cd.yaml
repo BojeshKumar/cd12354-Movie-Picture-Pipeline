@@ -76,6 +76,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies
+        run: pipenv install --dev --deploy
+
       - name: Build Docker image
         run: docker build -t backend:${{ github.sha }} .
 
@@ -107,7 +118,11 @@ jobs:
 
       - name: Deploy backend to Kubernetes
         run: |
-          kubectl set image deployment/backend \
+          cd k8s
+
+          kustomize edit set image \
             backend=146029314468.dkr.ecr.us-east-1.amazonaws.com/backend:${{ github.sha }}
+
+          kustomize build | kubectl apply -f -
 
           kubectl rollout status deployment/backend
