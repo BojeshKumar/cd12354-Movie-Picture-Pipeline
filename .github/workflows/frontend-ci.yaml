@@ -8,7 +8,7 @@ on:
       - main
     paths:
       - 'starter/frontend/**'
-      - '.github/workflows/frontend-ci.yml'
+      - '.github/workflows/frontend-ci.yaml'
 
 jobs:
   lint:
@@ -20,7 +20,7 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -45,7 +45,7 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -59,7 +59,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test -- --watchAll=false
+        run: npm run test -- --watchAll=false
 
   build:
     name: Build Frontend
@@ -71,7 +71,7 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -84,5 +84,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - name: Run tests
+        run: npm run test -- --watchAll=false
+
+      - name: Build Docker image
+        run: docker build -t frontend:${{ github.sha }} .
