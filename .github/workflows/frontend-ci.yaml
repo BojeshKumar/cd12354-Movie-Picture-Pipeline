@@ -87,5 +87,5 @@ jobs:
       - name: Run tests
         run: npm run test -- --watchAll=false
 
-      - name: Build Docker image
+      - name: Build application using Docker
         run: docker build -t frontend:${{ github.sha }} .
