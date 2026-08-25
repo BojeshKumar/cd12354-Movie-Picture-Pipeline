@@ -4,4 +4,4 @@ node_modules
 .terraform.tfstate.lock.info
 *.tfstate.backup
 credentials
-.pytest_cachestarter/frontend/.env
+starter/frontend/.env
